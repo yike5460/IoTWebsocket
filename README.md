@@ -3,7 +3,7 @@
 ![architecture](./media/architecture.png "architecture")
 
 基本演示效果如下
-![demo](./media/websocket_kds_inject.gif "demo")
+![demo](./media/websocket_historical_query.gif "demo")
 
 # 部署环境
 点击进入CloudFormation界面，选择cfn.yaml进行部署除connect/disconnect外的所有服务，包括API Gateway，Lambda，Kinesis，IAM。
