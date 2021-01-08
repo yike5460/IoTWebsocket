@@ -1,0 +1,36 @@
+{
+  "Records": [
+    {
+        "kinesis": {
+            "kinesisSchemaVersion": "1.0",
+            "partitionKey": "769900.6615707667",
+            "sequenceNumber": "49614299711302922324366605408824847595763526786523070466",
+            "data": "aGVsbG8gd29ybGQhCg==",
+            "approximateArrivalTimestamp": 1609944175.963
+        },
+        "eventSource": "aws:kinesis",
+        "eventVersion": "1.0",
+        "eventID": "shardId-000000000000:49614299711302922324366605408824847595763526786523070466",
+        "eventName": "aws:kinesis:record",
+        "invokeIdentityArn": "arn:aws-cn:iam::795474696122:role/IoTPython-StreamRole-1N7IPYE46NDLO",
+        "awsRegion": "cn-northwest-1",
+        "eventSourceARN": "arn:aws-cn:kinesis:cn-northwest-1:795474696122:stream/IoTPython-EventStream-5V9OW0KOLAE8/consumer/lambda:1609905799"
+    }, 
+    {
+        "kinesis": {
+            "kinesisSchemaVersion": "1.0",
+            "partitionKey": "483769.3965242713",
+            "sequenceNumber": "49614299711302922324366605408826056521583141415697776642",
+            "data": "aGVsbG8gd29ybGQhCg==",
+            "approximateArrivalTimestamp": 1609944175.966
+        },
+        "eventSource": "aws:kinesis",
+        "eventVersion": "1.0",
+        "eventID": "shardId-000000000000:49614299711302922324366605408826056521583141415697776642",
+        "eventName": "aws:kinesis:record",
+        "invokeIdentityArn": "arn:aws-cn:iam::795474696122:role/IoTPython-StreamRole-1N7IPYE46NDLO",
+        "awsRegion": "cn-northwest-1",
+        "eventSourceARN": "arn:aws-cn:kinesis:cn-northwest-1:795474696122:stream/IoTPython-EventStream-5V9OW0KOLAE8/consumer/lambda:1609905799"
+    }
+  ]
+}

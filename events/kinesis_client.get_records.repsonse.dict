@@ -1,0 +1,122 @@
+
+{'Records': [
+        {'SequenceNumber': '49614299711302922324366607738112999131697997145192792066', 'ApproximateArrivalTimestamp': datetime.datetime(2021,
+            1,
+            7,
+            9,
+            24,
+            38,
+            148000, tzinfo=tzlocal()), 'Data': b'{
+                "payload": {},
+                "connectionId": "YxX1LelkZPgAdWA="
+            }', 'PartitionKey': 'YxX1LelkZPgAdWA='
+        },
+        {'SequenceNumber': '49614299711302922324366607738122670538254914178590441474', 'ApproximateArrivalTimestamp': datetime.datetime(2021,
+            1,
+            7,
+            9,
+            24,
+            38,
+            279000, tzinfo=tzlocal()), 'Data': b'{
+                "payload": {},
+                "connectionId": "YxX1LelkZPgAdWA="
+            }', 'PartitionKey': 'YxX1LelkZPgAdWA='
+        },
+        {'SequenceNumber': '49614299711302922324366607738549421352578879033175965698', 
+            'ApproximateArrivalTimestamp': datetime.datetime(2021,
+            1,
+            7,
+            9,
+            24,
+            49,
+            669000, tzinfo=tzlocal()), 
+            'Data': b'{
+                "payload": "kinesisFetch:7h",
+                "connectionId": "YxX1LelkZPgAdWA="
+            }', 
+            'PartitionKey': 'YxX1LelkZPgAdWA='
+        },
+        {'SequenceNumber': '49614299711302922324366607746319187595242115582419533826', 'ApproximateArrivalTimestamp': datetime.datetime(2021,
+            1,
+            7,
+            9,
+            28,
+            26,
+            118000, tzinfo=tzlocal()), 'Data': b'{
+                "payload": {},
+                "connectionId": "YxX1LelkZPgAdWA="
+            }', 'PartitionKey': 'YxX1LelkZPgAdWA='
+        },
+        {'SequenceNumber': '49614299711302922324366607746320396521061730211594240002', 'ApproximateArrivalTimestamp': datetime.datetime(2021,
+            1,
+            7,
+            9,
+            28,
+            26,
+            134000, tzinfo=tzlocal()), 'Data': b'{
+                "payload": {},
+                "connectionId": "YxX1LelkZPgAdWA="
+            }', 'PartitionKey': 'YxX1LelkZPgAdWA='
+        },
+        {'SequenceNumber': '49614299711302922324366607746586360201376949179785412610', 'ApproximateArrivalTimestamp': datetime.datetime(2021,
+            1,
+            7,
+            9,
+            28,
+            33,
+            199000, tzinfo=tzlocal()), 'Data': b'{
+                "payload": {},
+                "connectionId": "YxYaDf-7ZPgAcYg="
+            }', 'PartitionKey': 'YxYaDf-7ZPgAcYg='
+        },
+        {'SequenceNumber': '49614299711302922324366607746599658385392710169426657282', 'ApproximateArrivalTimestamp': datetime.datetime(2021,
+            1,
+            7,
+            9,
+            28,
+            33,
+            378000, tzinfo=tzlocal()), 'Data': b'{
+                "payload": {},
+                "connectionId": "YxYaDf-7ZPgAcYg="
+            }', 'PartitionKey': 'YxYaDf-7ZPgAcYg='
+        },
+        {'SequenceNumber': '49614299711302922324366607746780997258334904889229967362', 'ApproximateArrivalTimestamp': datetime.datetime(2021,
+            1,
+            7,
+            9,
+            28,
+            38,
+            822000, tzinfo=tzlocal()), 'Data': b'{
+                "payload": "kinesisFetch:7h",
+                "connectionId": "YxYaDf-7ZPgAcYg="
+            }', 'PartitionKey': 'YxYaDf-7ZPgAcYg='
+        },
+        {'SequenceNumber': '49614299711302922324366607752539110937159394712191238146', 'ApproximateArrivalTimestamp': datetime.datetime(2021,
+            1,
+            7,
+            9,
+            31,
+            20,
+            459000, tzinfo=tzlocal()), 'Data': b'{
+                "payload": {},
+                "connectionId": "YxY0QeyE5PgAdWA="
+            }', 'PartitionKey': 'YxY0QeyE5PgAdWA='
+        },
+        {'SequenceNumber': '49614299711302922324366607752542737714618238599715356674', 'ApproximateArrivalTimestamp': datetime.datetime(2021,
+            1,
+            7,
+            9,
+            31,
+            20,
+            633000, tzinfo=tzlocal()), 'Data': b'{
+                "payload": {},
+                "connectionId": "YxY0QeyE5PgAdWA="
+            }', 'PartitionKey': 'YxY0QeyE5PgAdWA='
+        }
+    ], 
+    'NextShardIterator': 'AAAAAAAAAAHbqgvr31IU7IA5U9R3ofddcSS/I+5gTgv0tRM8moQKpyccaG+an9WQH2HUHeXHf0aDUEIWEq/V77jfzH2MMrQR3oA5dEMD+5FVCYDuFkYKm0gi+xRV6+/zcNSFfShPWshv1hZAFsDzC2F+pQamCujlFu2Ji1rb5lZbCVzL+WUyBn2BuoqrBh93tWu6xX8XwAtKO2iLxTNbcE5bEf1J6EV4+3HEZhxZ6lej4/zVcewNGP9R7kU4vx204UuYtPdsokc=', 'MillisBehindLatest': 1080000, 
+    'ResponseMetadata': {'RequestId': 'fdcd097d-3c70-4702-a5bd-d222f8e7754c', 'HTTPStatusCode': 200, 'HTTPHeaders': {'x-amzn-requestid': 'fdcd097d-3c70-4702-a5bd-d222f8e7754c', 'x-amz-id-2': '/+Led43fxLbDi+xCjv5PapSNFmJkvoEnRUff/k4rN46yw90rkX7n2uLGM9ey3lheEmUUi3fqthtEn6qju0jDCSKwRT11iw1O', 'date': 'Thu,
+            7 Jan 2021 09: 49: 19 GMT', 'content-type': 'application/x-amz-json-1.1', 'content-length': '2743'
+        }, 'RetryAttempts': 0
+    }
+}

@@ -1,15 +1,21 @@
+# 整体架构
+![architecture]](./media/architecture.png "architecture")
+
+演示视频
+![demo]](./media/websocket_kds_inject.gif "demo")
+
 # 部署环境
 点击进入CloudFormation界面，选择cfn.yaml进行部署除connect/disconnect外的所有服务，包括API Gateway，Lambda，Kinesis，IAM。
-部署完毕后，
+部署完毕后，手动进行如下步骤（未来会通过CloudFormation自动化）
 - 部署Lambda函数实现Websocket连接的connect/disconnect功能，其中代码部分直接拷贝src目录下的connect.py和disconnect.py
 - 进入API Gateway界面，将route下的@connect和@disconnect对接上一步创建好的Lambda函数
 - 进入DynamoDB界面，创建IoTconnection表项，其中key为connectionId
-  
+
 # 测试环境
 
 **登入环境**
 ```
-ssh -i "china-general.pem" ec2-user@ec2-68-79-18-158.cn-northwest-1.compute.amazonaws.com.cn
+ssh -i "china-general.pem" ec2-user@ec2-68-xx-xx-158.cn-northwest-1.compute.amazonaws.com.cn
 ```
 **脚本自动生成随机文件**
 ```
@@ -110,6 +116,8 @@ wscat -c wss://2ei2kyn7u6.execute-api.cn-northwest-1.amazonaws.com.cn/v1
 
 < 20210107-105407
 ```
+
+
 
 
 

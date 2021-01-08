@@ -1,0 +1,249 @@
+---
+Resources:
+  Api:
+    Type: 'AWS::ApiGatewayV2::Api'
+    Properties:
+      Name: !Ref 'AWS::StackName'
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: '\$default'
+  DefaultRoute:
+    Type: 'AWS::ApiGatewayV2::Route'
+    Properties:
+      ApiId: !Ref Api
+      AuthorizationType: NONE
+      RouteKey: '$default'
+      Target: !Sub 'integrations/${KinesisIntegration}'
+  Stage:
+    Type: 'AWS::ApiGatewayV2::Stage'
+    Properties:
+      ApiId: !Ref Api
+      DeploymentId: !Ref Deployment
+      StageName: 'v1'
+      DefaultRouteSettings:
+        LoggingLevel: INFO
+        DataTraceEnabled: true
+  Deployment:
+    Type: 'AWS::ApiGatewayV2::Deployment'
+    DependsOn: DefaultRoute
+    Properties:
+      ApiId: !Ref Api
+  KinesisIntegration:
+    Type: 'AWS::ApiGatewayV2::Integration'
+    Properties:
+      ApiId: !Ref Api
+      CredentialsArn: !GetAtt IntegrationRole.Arn
+      IntegrationMethod: 'POST'
+      IntegrationType: 'AWS'
+      IntegrationUri: !Sub 'arn:aws-cn:apigateway:${AWS::Region}:kinesis:action/PutRecord'
+      RequestTemplates:
+        default: !Sub |
+          #set($payload = $input.json('$'))
+          #set($data = "{""payload"": $payload, ""connectionId"": ""$context.connectionId""}")
+          {
+              "Data": "$util.base64Encode($data)",
+              "PartitionKey": "$context.connectionId",
+              "StreamName": "${EventStream}"
+          }
+      TemplateSelectionExpression: default
+  IntegrationRole:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - 'apigateway.amazonaws.com'
+          Action:
+          - 'sts:AssumeRole'
+      Policies:
+      - PolicyName: logs
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action: 'kinesis:PutRecord'
+            Resource: !GetAtt 'EventStream.Arn'
+  EventStream:
+    Type: 'AWS::Kinesis::Stream'
+    Properties: 
+      ShardCount: 1
+  EventStreamConsumer:
+    Type: 'AWS::Kinesis::StreamConsumer'
+    Properties:
+      ConsumerName: lambda
+      StreamARN: !GetAtt EventStream.Arn
+  EventSourceMapping:
+    Type: 'AWS::Lambda::EventSourceMapping'
+    Properties:
+      BatchSize: 16
+      Enabled: true
+      EventSourceArn: !Ref EventStreamConsumer
+      FunctionName: !GetAtt 'StreamFunction.Arn'
+      StartingPosition: LATEST
+  StreamFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Handler: 'index.handler'
+      Runtime: 'python3.8'
+      MemorySize: 128
+      Timeout: 30
+      Role: !GetAtt 'StreamRole.Arn'
+      Code:
+        ZipFile: !Sub |
+          import json
+          import logging
+          import os
+          import boto3
+          from botocore.exceptions import ClientError
+          import base64
+
+          import datetime
+          import time
+          # import simplejson
+
+          # Set up logging
+          logging.basicConfig(format='%(levelname)s: %(asctime)s: %(message)s')
+          logger = logging.getLogger()
+          logger.setLevel(logging.INFO)
+          kinesisAction = 'kinesisFetch'
+          kinesisFreq = 3600
+
+          def handler(event, context):
+              # Send the message to each connection
+              api_client = boto3.client('apigatewaymanagementapi', endpoint_url='${Api}.execute-api.${AWS::Region}.amazonaws.com.cn/${Stage}')
+              logger.info("event record is {}".format(json.dumps(event['Records'])))
+              
+
+              dynamodb_client = boto3.client('dynamodb')
+              kinesis_client = boto3.client('kinesis')
+              
+              table_name = 'IoTconnection' # os.environ['TableName']
+              
+              # Retrieve all connection IDs from the table
+              try:
+                  response = dynamodb_client.scan(TableName=table_name,
+                                                  ProjectionExpression='connectionId')
+              except ClientError as e:
+                  logger.error(e)
+                  raise ValueError(e)
+              
+              # Sending to all connected websocket
+              for item in response['Items']:
+                  connectionId = item['connectionId']['S']
+                  try:
+                      for record in event['Records']:
+                          # decode data to raw string
+                          rawData = base64.b64decode(record['kinesis']['data'])
+                          logger.info("rawData is {}".format(rawData))
+                          
+                          # from client direction, depend on wss input content
+                          if(rawData.decode('utf8').find(kinesisAction)!=-1):
+                              
+                              # transform to json string
+                              stringData = json.loads(rawData.decode('utf8').replace("'", '"'))
+                              jsonData = json.dumps(stringData, indent=4, sort_keys=True)
+                              
+                              # fetch payload and connectionId
+                              payload = eval(jsonData)['payload']
+                              print("payload here is {}".format(payload))
+                              # overwrite connectionId directly, should be same with value stored in dynamoDB
+                              connectionId = eval(jsonData)['connectionId']
+                  
+                              # transform to binary format, extract fetch frequencyTBD
+                              binaryPayload = json.dumps(payload, indent=4).encode('utf-8')
+                              
+                              start_timestamp = int(time.time()) - kinesisFreq
+                              response = kinesis_client.get_shard_iterator(
+                                  StreamName='IoTPython-EventStream-5V9OW0KOLAE8',
+                                  ShardId='shardId-000000000000',
+                                  ShardIteratorType='AT_TIMESTAMP',
+                                  Timestamp=start_timestamp # datetime.date.today()
+                              )
+                              print("shard is {}".format(response['ShardIterator']))
+                      
+                              shard_iter = response['ShardIterator']
+                              
+                              # local debug
+                              # response = kinesis_client.get_records(ShardIterator=shard_iter, Limit=10)
+                              # print("historical record {}".format(response['Records']))
+                              # print("historical record {}".format(response['NextShardIterator']))
+                              
+                              # constrain to 100 records
+                              record_count = 0
+                              while record_count < 100:
+                                  response = kinesis_client.get_records(ShardIterator=shard_iter, Limit=10)
+                                  shard_iter = response['NextShardIterator']
+                                  records = response['Records']
+                                  record_count += len(records)
+                                  for i in range(len(records)):
+                                      rawData = records[i]['Data']
+                                      logger.info("sending payload {} with connectionId {} to websocket".format(rawData, connectionId))
+                                      try:
+                                          api_client.post_to_connection(Data=rawData,
+                                                                        ConnectionId=connectionId)
+                                      except ClientError as e:
+                                          logger.error(e) 
+                          
+                          # from kinesis direction, display output directly
+                          else:
+                              logger.info("sending payload {} with connectionId {} to websocket".format(rawData, connectionId))
+                              try:
+                                  api_client.post_to_connection(Data=rawData,
+                                                                ConnectionId=connectionId)
+                              except ClientError as e:
+                                  logger.error(e)                                
+                  except ClientError as e:
+                      logger.error(e)
+
+              # Construct response
+              response = {'statusCode': 200}
+              return response
+  StreamRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: 'lambda.amazonaws.com'
+          Action: 'sts:AssumeRole'
+      Policies:
+      - PolicyName: lambda
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action: 'execute-api:ManageConnections'
+            Resource: !Sub 'arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${Api}/${Stage}/POST/@connections/*'
+          - Effect: Allow
+            Action: 
+            - 'kinesis:ListShards'
+            Resource: '*'
+          - Effect: Allow
+            Action: 
+            - 'kinesis:SubscribeToShard'
+            - 'kinesis:DescribeStreamSummary'
+            - 'kinesis:GetShardIterator'
+            - 'kinesis:GetRecords'
+            Resource:
+            - !GetAtt EventStream.Arn
+          - Effect: Allow
+            Action: 
+            - 'kinesis:SubscribeToShard'
+            Resource:
+            - !GetAtt EventStreamConsumer.ConsumerARN
+          - Effect: Allow
+            Action:
+            - 'logs:CreateLogStream'
+            - 'logs:PutLogEvents'
+            Resource: '*'
+  StreamLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${StreamFunction}'
+      RetentionInDays: 14
+Outputs:
+  WebSocketURI:
+    Value: !Sub 'wss://${Api}.execute-api.${AWS::Region}.amazonaws.com.cn/${Stage}'
