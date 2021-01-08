@@ -1,8 +1,9 @@
 # 整体架构
-![architecture]](./media/architecture.png "architecture")
+用户通过连接API Gateway实现的Websocket获取后端Kinesis Data Stream的实时数据和历史数据
+![architecture](./media/architecture.png "architecture")
 
-演示视频
-![demo]](./media/websocket_kds_inject.gif "demo")
+基本演示效果如下
+![demo](./media/websocket_kds_inject.gif "demo")
 
 # 部署环境
 点击进入CloudFormation界面，选择cfn.yaml进行部署除connect/disconnect外的所有服务，包括API Gateway，Lambda，Kinesis，IAM。
