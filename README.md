@@ -3,7 +3,7 @@
 ![architecture](./media/architecture.png "architecture")
 
 基本演示效果如下
-![demo](./media/websocket_historical_query.gif "demo")
+![demo](./media/websocket_dashboard.gif "demo")
 
 # 部署环境
 点击进入CloudFormation界面，选择cfn.yaml进行部署除connect/disconnect外的所有服务，包括API Gateway，Lambda，Kinesis，IAM。
@@ -22,8 +22,15 @@ ssh -i "china-general.pem" ec2-user@ec2-68-xx-xx-158.cn-northwest-1.compute.amaz
 ```
 [root@ip-172-31-21-238 ec2-user]# cat kinesis.sh 
 # !/bin/bash
+function rand(){
+    min=$1
+    max=$(($2-$min+1))
+    num=$(($RANDOM+100000000))
+    echo $(($num%$max+$min))
+}
+
 i=0;
-while true; do i=$[$i+1]; echo $(date "+%Y%m%d-%H%M%S") > /tmp/app.logtime.$i; sleep 15; done
+while true; do i=$[$i+1]; echo {\"deviceID\": \"id-$(rand 10000 10005)\", \"value\": \"$(rand 50 100)\", \"time\": \"$(date "+%Y%m%d%H%M")\"} > /tmp/app.logtime.$i; sleep 5; done
 
 [root@ip-172-31-21-238 ec2-user]# ls /tmp/app.logtime.* | wc -l
 532
@@ -95,28 +102,30 @@ Hint: Some lines were ellipsized, use -l to show in full.
 连接成功后，可以看到有对应随机文件内容的持续输出，输入kinesisFetch可以查看到历史数据（固定为1小时前到当前的kinesis数据）
 ```
 wscat -c wss://2ei2kyn7u6.execute-api.cn-northwest-1.amazonaws.com.cn/v1
-< 20210107-115453
+< {"deviceID": "id-10000", "value": "92", "time": "202101111046"}
 
-< 20210107-115508
+< {"deviceID": "id-10002", "value": "60", "time": "202101111046"}
 
-< 20210107-115523
+< {"deviceID": "id-10003", "value": "69", "time": "202101111046"}
 
-< 20210107-115538
+< {"deviceID": "id-10004", "value": "82", "time": "202101111046"}
 
-< 20210107-115553
+< {"deviceID": "id-10003", "value": "69", "time": "202101111047"}
+
+< {"deviceID": "id-10002", "value": "73", "time": "202101111047"}
 
 > kinesisFetch
-
-< 20210107-105307
-
-< 20210107-105322
-
-< 20210107-105337
-
-< 20210107-105352
-
-< 20210107-105407
 ```
+
+**登陆dashboard查看实时数据**
+IoT通过[d3js](https://d3js.org/)实现动态展示
+```
+python -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+127.0.0.1 - - [11/Jan/2021 18:37:03] "GET / HTTP/1.1" 304 -
+```
+
+
 
 
 
