@@ -3,6 +3,7 @@
 ![architecture](./media/architecture.png "architecture")
 
 基本演示效果如下
+
 ![demo](./media/websocket_dashboard.gif "demo")
 
 # 部署环境
