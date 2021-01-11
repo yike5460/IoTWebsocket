@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Dimensional Charting</title>
+
+      <link rel="stylesheet" type="text/css" href="http://dc-js.github.io/dc.js/css/dc.css"/>
+        <script type="text/javascript" src="http://dc-js.github.io/dc.js/js/d3.js"></script>
+        <script type="text/javascript" src="http://dc-js.github.io/dc.js/js/crossfilter.js"></script>
+        <script type="text/javascript" src="http://dc-js.github.io/dc.js/js/dc.js"></script>
+</head>
+
+<body>
+
+<div id="chart-ring-year"></div>
+<div id="chart-row-spenders"></div>
+
+<script type="text/javascript">
+
+    var yearRingChart   = dc.pieChart("#chart-ring-year"),
+        spenderRowChart = dc.rowChart("#chart-row-spenders");
+
+    var connection = new WebSocket('wss://2ei2kyn7u6.execute-api.cn-northwest-1.amazonaws.com.cn/v1');
+
+    var initialData = [
+        {deviceID: 'id-10001', value: '87', time: '20210111'},
+        {deviceID: 'id-10002', value: '92', time: '20210111'},
+        {deviceID: 'id-10003', value: '78', time: '20210111'},
+        {deviceID: 'id-10004', value: '59', time: '20210111'},
+        {deviceID: 'id-10005', value: '52', time: '20210111'},
+    ];
+
+    // set crossfilter with first dataset
+    var xfilter = crossfilter(initialData),
+        timeDim  = xfilter.dimension(function(d) {return +d.time;}),
+        usageDim = xfilter.dimension(function(d) {return Math.floor(d.value/10);}),
+        deviceDim  = xfilter.dimension(function(d) {return d.deviceID;}),
+      
+        spendPerYear = timeDim.group().reduceSum(function(d) {return +d.value;}),
+        spendPerName = deviceDim.group().reduceSum(function(d) {return +d.value;});
+
+    function render_plots(){
+        yearRingChart
+            .width(200).height(200)
+            .dimension(timeDim)
+            .group(spendPerYear)
+            .innerRadius(50);
+
+        spenderRowChart
+            .width(250).height(200)
+            .dimension(deviceDim)
+            .group(spendPerName)
+            .elasticX(true);
+
+        dc.renderAll();
+    }
+
+    render_plots();
+
+    function resetData(ndx, dimensions) {
+        var yearChartFilters = yearRingChart.filters();
+        var spenderChartFilters = spenderRowChart.filters();
+
+        yearRingChart.filter(null);
+        spenderRowChart.filter(null);
+
+        xfilter.remove();
+
+        yearRingChart.filter([yearChartFilters]);
+        spenderRowChart.filter([spenderChartFilters]);
+
+    }
+
+    connection.onmessage = function(event) {
+        var newData = JSON.parse((event.data));
+        var updateObject =[{
+            "deviceID": newData.deviceID,
+            "time": newData.time,
+            "value": newData.value
+        }]
+        console.log(updateObject)
+        // resetData(null, [timeDim, usageDim, deviceDim]);
+        xfilter.add(updateObject);
+        dc.redrawAll();
+    }
+
+</script>
+</body>
+</html>
