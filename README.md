@@ -2,9 +2,11 @@
 用作将如下所示特定数据A格式转换成数据B格式。
 
 数据A格式（产品所用）
+
 ![productData](./media/productData.png "productData")
 
 数据B格式（方案所用）
+
 ![solutionData](./media/solutionData.png "solutionData")
 
 具体用法执行 DataAdapter.py，第一个参数为原始数据所在的s3桶，第二个参数为转换完毕后数据所上传的s3桶
