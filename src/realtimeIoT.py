@@ -18,7 +18,7 @@ kinesisFreq = 3600
 
 def handler(event, context):
     # Send the message to each connection
-    api_client = boto3.client('apigatewaymanagementapi', endpoint_url='${Api}.execute-api.${AWS::Region}.amazonaws.com.cn/${Stage}')
+    api_client = boto3.client('apigatewaymanagementapi', endpoint_url='https://2ei2kyn7u6.execute-api.cn-northwest-1.amazonaws.com.cn/v1')
     logger.info("event record is {}".format(json.dumps(event['Records'])))
     
 

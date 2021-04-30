@@ -1,4 +1,20 @@
-# 整体架构
+# ETL工具（新增）
+用作将如下所示特定数据A格式转换成数据B格式。
+
+数据A格式（产品所用）
+![productData](./media/productData.png "productData")
+
+数据B格式（方案所用）
+![solutionData](./media/solutionData.png "solutionData")
+
+具体用法执行 DataAdapter.py，第一个参数为原始数据所在的s3桶，第二个参数为转换完毕后数据所上传的s3桶
+```
+# python3 DataAdapter.py -h
+usage: python DataAdapter.py -i <s3 url of inputFile>, -o <s3 url of outputFile>, format like like s3://bucket/prefix/file.json
+# python3 DataAdapter.py -i s3://aaronsfileshare/CSDC/original.json -o s3://aaronsfileshare/CSDC/final.csv
+```
+
+# IoTWebsocket整体架构
 用户通过连接API Gateway实现的Websocket获取后端Kinesis Data Stream的实时数据和历史数据
 ![architecture](./media/architecture.png "architecture")
 
